@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Edit, merge, split and extract text from PDF files online for free. No upload required.">
+  <title>PDF Editor - ToolsWala</title>
+  
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../../assets/css/input.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  
+  <style>
+    :root {
+      --pdf-primary: #ec4899;
+      --pdf-accent: #f472b6;
+    }
+    
+    body {
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+    
+    .tool-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 4rem) 1.5rem;
+    }
+    
+    .tool-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .tool-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid rgba(236, 72, 153, 0.3);
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: #f9a8d4;
+      margin-bottom: 1rem;
+    }
+    
+    .tool-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 0.75rem;
+    }
+    
+    .tool-description {
+      color: #94a3b8;
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Upload Zone */
+    .upload-zone {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 1.5rem;
+      padding: 4rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+    }
+    
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--pdf-primary);
+      background: rgba(236, 72, 153, 0.05);
+    }
+    
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--pdf-primary);
+    }
+    
+    .upload-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+    
+    .upload-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-subtitle {
+      color: #94a3b8;
+      font-size: 0.9375rem;
+    }
+    
+    .upload-input {
+      display: none;
+    }
+    
+    .file-info {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid rgba(236, 72, 153, 0.3);
+      border-radius: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    .file-info.active {
+      display: flex;
+    }
+    
+    .file-icon {
+      font-size: 2rem;
+    }
+    
+    .file-details {
+      flex: 1;
+      text-align: left;
+    }
+    
+    .file-name {
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.25rem;
+    }
+    
+    .file-size {
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+    
+    .remove-file {
+      padding: 0.5rem;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .remove-file:hover {
+      background: rgba(236, 72, 153, 0.2);
+      color: #f472b6;
+    }
+    
+    /* Tools Grid */
+    .tools-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .tool-option {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .tool-option:hover {
+      transform: translateY(-4px);
+      border-color: rgba(236, 72, 153, 0.3);
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.2);
+    }
+    
+    .tool-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    .tool-option-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 1rem;
+      background: rgba(236, 72, 153, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--pdf-primary);
+    }
+    
+    .tool-option-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tool-option-desc {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, var(--pdf-primary), var(--pdf-accent));
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.4);
+    }
+    
+    .btn-action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Preview Area */
+    .preview-area {
+      display: none;
+      margin-top: 2rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      padding: 2rem;
+    }
+    
+    .preview-area.active {
+      display: block;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .preview-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    
+    .pdf-preview {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    
+    .breadcrumb a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .breadcrumb a:hover {
+      color: #f1f5f9;
+    }
+    
+    .breadcrumb-separator {
+      opacity: 0.5;
+    }
+    
+    .breadcrumb-current {
+      color: #f1f5f9;
+    }
+    
+    /* Loading */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .loading-overlay.active {
+      display: flex;
+    }
+    
+    .loading-spinner-lg {
+      width: 64px;
+      height: 64px;
+      border: 4px solid rgba(236, 72, 153, 0.2);
+      border-top-color: var(--pdf-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-message {
+      color: #f1f5f9;
+      font-size: 1.125rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar Container -->
+  <div id="navbar-container"></div>
+  
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner-lg"></div>
+    <p class="loading-message">Processing your PDF...</p>
+  </div>
+  
+  <!-- Main Content -->
+  <main class="tool-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">PDF Editor</span>
+    </nav>
+    
+    <!-- Header -->
+    <header class="tool-header">
+      <div class="tool-badge">
+        <span>✨</span>
+        <span>Free Online Tool</span>
+      </div>
+      <h1 class="tool-title gradient-text">PDF Editor</h1>
+      <p class="tool-description">
+        Edit, merge, split, and extract text from PDF files. 
+        Fast, secure, and completely free.
+      </p>
+    </header>
+    
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="upload-zone">
+      <div class="upload-icon">📄</div>
+      <h3 class="upload-title">Drop your PDF here</h3>
+      <p class="upload-subtitle">or click to browse (max 50MB)</p>
+      <input type="file" id="file-input" class="upload-input" accept=".pdf">
+      
+      <div class="file-info" id="file-info">
+        <div class="file-icon">📁</div>
+        <div class="file-details">
+          <div class="file-name" id="file-name">document.pdf</div>
+          <div class="file-size" id="file-size">2.5 MB</div>
+        </div>
+        <button class="remove-file" id="remove-file">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-action" id="process-btn" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        Process PDF
+      </button>
+      <button class="btn-action btn-secondary" id="clear-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Clear
+      </button>
+    </div>
+    
+    <!-- Tools Options -->
+    <div class="tools-options">
+      <div class="tool-option disabled" data-tool="extract-text">
+        <div class="tool-option-icon">📝</div>
+        <h3 class="tool-option-title">Extract Text</h3>
+        <p class="tool-option-desc">Extract all text content from your PDF file</p>
+      </div>
+      
+      <div class="tool-option disabled" data-tool="merge">
+        <div class="tool-option-icon">🔗</div>
+        <h3 class="tool-option-title">Merge PDFs</h3>
+        <p class="tool-option-desc">Combine multiple PDF files into one</p>
+      </div>
+      
+      <div class="tool-option disabled" data-tool="split">
+        <div class="tool-option-icon">✂️</div>
+        <h3 class="tool-option-title">Split PDF</h3>
+        <p class="tool-option-desc">Split PDF into multiple separate files</p>
+      </div>
+      
+      <div class="tool-option disabled" data-tool="compress">
+        <div class="tool-option-icon">📦</div>
+        <h3 class="tool-option-title">Compress</h3>
+        <p class="tool-option-desc">Reduce PDF file size while maintaining quality</p>
+      </div>
+    </div>
+    
+    <!-- Preview Area -->
+    <div class="preview-area" id="preview-area">
+      <div class="preview-header">
+        <h3 class="preview-title">Preview</h3>
+      </div>
+      <div class="pdf-preview">
+        <p>PDF preview will appear here after processing</p>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Load Navbar -->
+  <script>
+    fetch('../../components/navbar.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      })
+      .catch(err => console.error('Failed to load navbar:', err));
+  </script>
+  
+  <!-- Tool Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elements
+      const uploadZone = document.getElementById('upload-zone');
+      const fileInput = document.getElementById('file-input');
+      const fileInfo = document.getElementById('file-info');
+      const fileName = document.getElementById('file-name');
+      const fileSize = document.getElementById('file-size');
+      const removeFileBtn = document.getElementById('remove-file');
+      const processBtn = document.getElementById('process-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const toolOptions = document.querySelectorAll('.tool-option');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      const previewArea = document.getElementById('preview-area');
+      
+      // State
+      let selectedFile = null;
+      
+      // Format file size
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
+      // Handle file selection
+      function handleFile(file) {
+        if (!file || file.type !== 'application/pdf') {
+          alert('Please select a valid PDF file');
+          return;
+        }
+        
+        if (file.size > 50 * 1024 * 1024) {
+          alert('File size must be less than 50MB');
+          return;
+        }
+        
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.add('active');
+        uploadZone.classList.add('has-file');
+        processBtn.disabled = false;
+        
+        // Enable tool options
+        toolOptions.forEach(option => {
+          option.classList.remove('disabled');
+        });
+      }
+      
+      // Click to upload
+      uploadZone.addEventListener('click', (e) => {
+        if (e.target !== removeFileBtn && !removeFileBtn.contains(e.target)) {
+          fileInput.click();
+        }
+      });
+      
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFile(e.target.files[0]);
+        }
+      });
+      
+      // Drag and drop
+      uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+      });
+      
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+      });
+      
+      uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length > 0) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+      
+      // Remove file
+      removeFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedFile = null;
+        fileInput.value = '';
+        fileInfo.classList.remove('active');
+        uploadZone.classList.remove('has-file');
+        processBtn.disabled = true;
+        
+        // Disable tool options
+        toolOptions.forEach(option => {
+          option.classList.add('disabled');
+        });
+      });
+      
+      // Clear button
+      clearBtn.addEventListener('click', () => {
+        removeFileBtn.click();
+        previewArea.classList.remove('active');
+      });
+      
+      // Process button (demo - UI only)
+      processBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+        
+        loadingOverlay.classList.add('active');
+        
+        // Simulate processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        loadingOverlay.classList.remove('active');
+        previewArea.classList.add('active');
+        
+        alert('This is a UI demo. In production, this would call the PDF API backend.');
+      });
+      
+      // Tool option clicks
+      toolOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          if (option.classList.contains('disabled')) return;
+          
+          const toolName = option.dataset.tool;
+          alert(`${toolName} feature - UI demo only. Backend integration required.`);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

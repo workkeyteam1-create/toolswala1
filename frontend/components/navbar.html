@@ -1,0 +1,287 @@
+<!-- ToolsWala Navbar Component -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <a href="/" class="navbar-logo">
+      <span class="logo-icon">🛠️</span>
+      <span class="logo-text">Tools<span class="gradient-text">Wala</span></span>
+    </a>
+    
+    <!-- Desktop Navigation -->
+    <div class="navbar-desktop">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/#tools" class="nav-link">Tools</a>
+      <a href="/#about" class="nav-link">About</a>
+      <button class="btn-search" id="search-trigger" aria-label="Search tools">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <span class="search-hint">Search</span>
+        <kbd class="search-shortcut">⌘K</kbd>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu Button -->
+    <button class="navbar-mobile-toggle" id="mobile-menu-btn" aria-label="Toggle menu">
+      <span class="hamburger"></span>
+    </button>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <div class="navbar-mobile" id="mobile-menu">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/#tools" class="nav-link">Tools</a>
+    <a href="/#about" class="nav-link">About</a>
+    <button class="btn-search mobile" id="mobile-search-trigger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <span>Search Tools</span>
+    </button>
+  </div>
+</nav>
+
+<style>
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.navbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #f1f5f9;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: transform 0.2s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-icon {
+  font-size: 1.75rem;
+}
+
+.logo-text .gradient-text {
+  background: linear-gradient(135deg, #6366f1, #d946ef);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-desktop {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #6366f1, #d946ef);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #f1f5f9;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.btn-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-search:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f1f5f9;
+}
+
+.search-hint {
+  font-size: 0.875rem;
+}
+
+.search-shortcut {
+  padding: 0.125rem 0.375rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: #64748b;
+}
+
+.navbar-mobile-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.hamburger {
+  position: relative;
+  width: 20px;
+  height: 2px;
+  background: #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 2px;
+  background: #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.hamburger::before {
+  top: -6px;
+}
+
+.hamburger::after {
+  bottom: -6px;
+}
+
+.navbar-mobile-toggle.active .hamburger {
+  background: transparent;
+}
+
+.navbar-mobile-toggle.active .hamburger::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.navbar-mobile-toggle.active .hamburger::after {
+  bottom: 0;
+  transform: rotate(-45deg);
+}
+
+.navbar-mobile {
+  display: none;
+  flex-direction: column;
+  padding: 1rem 1.5rem;
+  background: rgba(2, 6, 23, 0.98);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 0.5rem;
+}
+
+.navbar-mobile.active {
+  display: flex;
+}
+
+.navbar-mobile .nav-link {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-search.mobile {
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .navbar-desktop {
+    display: none;
+  }
+  
+  .navbar-mobile-toggle {
+    display: flex;
+  }
+}
+</style>
+
+<script>
+// Navbar functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const searchTrigger = document.getElementById('search-trigger');
+  const mobileSearchTrigger = document.getElementById('mobile-search-trigger');
+  
+  // Mobile menu toggle
+  if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenuBtn.classList.toggle('active');
+      mobileMenu.classList.toggle('active');
+    });
+    
+    // Close menu when clicking a link
+    mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenuBtn.classList.remove('active');
+        mobileMenu.classList.remove('active');
+      });
+    });
+  }
+  
+  // Search trigger
+  const openSearch = () => {
+    if (typeof commandPalette !== 'undefined') {
+      commandPalette.open();
+    }
+  };
+  
+  if (searchTrigger) {
+    searchTrigger.addEventListener('click', openSearch);
+  }
+  
+  if (mobileSearchTrigger) {
+    mobileSearchTrigger.addEventListener('click', openSearch);
+  }
+});
+</script>
