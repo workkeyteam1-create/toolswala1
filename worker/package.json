@@ -1,0 +1,28 @@
+{
+  "name": "toolswala-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker backend for ToolsWala - Online Tools Platform",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "serverless",
+    "tools",
+    "api"
+  ],
+  "author": "ToolsWala Team",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
