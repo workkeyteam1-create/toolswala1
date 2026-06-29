@@ -25,7 +25,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
   <!-- Compiled CSS (in production this would be main.css from Tailwind build) -->
-  <link rel="stylesheet" href="./assets/css/input.css">
+  <link rel="stylesheet" href="./assets/css/main.css">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
@@ -572,12 +572,21 @@
   
   <!-- Load Navbar Component -->
   <script>
-    fetch('./components/navbar.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('navbar-container').innerHTML = html;
-      })
-      .catch(err => console.error('Failed to load navbar:', err));
+    async function loadNavbar() {
+      const navbarContainer = document.getElementById('navbar-container');
+      if (!navbarContainer) return;
+      try {
+        const response = await fetch('./components/navbar.html');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const html = await response.text();
+        navbarContainer.innerHTML = html;
+      } catch (error) {
+        console.error('Failed to load navbar:', error);
+        navbarContainer.innerHTML = '<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(2,6,23,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.1);padding:1rem 1.5rem;"><div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;"><a href="./" style="color:#f1f5f9;text-decoration:none;font-size:1.25rem;font-weight:700;">🛠️ ToolsWala</a><div style="display:flex;gap:1.5rem;"><a href="./#tools" style="color:#94a3b8;text-decoration:none;">Tools</a><a href="./#about" style="color:#94a3b8;text-decoration:none;">About</a></div></div></nav>';
+      }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadNavbar);
+    else loadNavbar();
   </script>
   
   <!-- Load Scripts -->
@@ -609,6 +618,7 @@
     async function loadTools() {
       try {
         const response = await fetch('./data/tools.json');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
         allTools = data.tools || [];
         
@@ -619,6 +629,7 @@
       } catch (error) {
         console.error('Failed to load tools:', error);
         showErrorToast('Failed to load tools. Please refresh the page.');
+        allTools = [];
       }
     }
     

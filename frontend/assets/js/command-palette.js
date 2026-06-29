@@ -29,7 +29,9 @@ class CommandPalette {
   
   async loadTools() {
     try {
-      const response = await fetch('/data/tools.json');
+      // Use relative path that works from any page depth
+      const basePath = window.location.pathname.includes('/tools/') ? '../' : './';
+      const response = await fetch(`${basePath}data/tools.json`);
       const data = await response.json();
       this.tools = data.tools || [];
     } catch (error) {
@@ -426,7 +428,9 @@ class CommandPalette {
   }
   
   selectTool(tool) {
-    window.location.href = `/tools/${tool.slug}/`;
+    // Use relative path that works from any page depth
+    const basePath = window.location.pathname.includes('/tools/') ? '../' : './';
+    window.location.href = `${basePath}tools/${tool.slug}/`;
   }
   
   highlightMatch(text) {
