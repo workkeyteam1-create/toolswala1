@@ -1,0 +1,11 @@
+Flask==3.0.0
+flask-cors==4.0.0
+gunicorn==21.2.0
+
+# QR Code generation (uncomment when implementing actual logic)
+# qrcode[pil]==7.4.2
+# pillow==10.1.0
+
+# PDF processing dependencies (if needed in future)
+# PyPDF2==3.0.1
+# reportlab==4.0.7
