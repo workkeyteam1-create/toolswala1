@@ -257,6 +257,160 @@ function smoothScrollTo(element, offset = 0) {
   });
 }
 
+// ============================================
+// Form Validation Utilities
+// ============================================
+
+const validators = {
+  required(value) {
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (Array.isArray(value)) return value.length > 0;
+    return value !== null && value !== undefined;
+  },
+  
+  email(value) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  },
+  
+  minLength(min) {
+    return (value) => {
+      if (!value) return true;
+      return value.length >= min;
+    };
+  },
+  
+  maxLength(max) {
+    return (value) => {
+      if (!value) return true;
+      return value.length <= max;
+    };
+  },
+  
+  pattern(regex) {
+    return (value) => {
+      if (!value) return true;
+      return regex.test(value);
+    };
+  },
+  
+  number(min = -Infinity, max = Infinity) {
+    return (value) => {
+      if (!value) return true;
+      const num = parseFloat(value);
+      return !isNaN(num) && num >= min && num <= max;
+    };
+  },
+  
+  url(value) {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+};
+
+// Validate a single field
+function validateField(field, rules = []) {
+  const value = field.type === 'checkbox' ? field.checked : field.value;
+  const errors = [];
+  
+  for (const rule of rules) {
+    const isValid = typeof rule.validator === 'function' 
+      ? rule.validator(value)
+      : validators[rule.type]?.(value);
+    
+    if (!isValid) {
+      errors.push(rule.message || `Invalid ${field.name || 'field'}`);
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    value
+  };
+}
+
+// Validate entire form
+function validateForm(formElement, validationRules = {}) {
+  const results = {};
+  let isFormValid = true;
+  
+  const fields = formElement.querySelectorAll('input, select, textarea');
+  
+  fields.forEach(field => {
+    const fieldName = field.name || field.id;
+    if (!fieldName) return;
+    
+    const rules = validationRules[fieldName] || [];
+    const result = validateField(field, rules);
+    
+    results[fieldName] = result;
+    
+    // Update field UI
+    field.classList.toggle('valid', result.isValid);
+    field.classList.toggle('invalid', !result.isValid);
+    field.setAttribute('aria-invalid', !result.isValid);
+    
+    // Show/hide error message
+    const errorContainer = field.parentElement.querySelector('.error-message') || 
+                          formElement.querySelector(`[data-error-for="${fieldName}"]`);
+    
+    if (errorContainer) {
+      if (!result.isValid) {
+        errorContainer.textContent = result.errors.join(', ');
+        errorContainer.style.display = 'block';
+      } else {
+        errorContainer.textContent = '';
+        errorContainer.style.display = 'none';
+      }
+    }
+    
+    if (!result.isValid) {
+      isFormValid = false;
+    }
+  });
+  
+  return {
+    isValid: isFormValid,
+    fields: results
+  };
+}
+
+// Add real-time validation to form fields
+function enableRealTimeValidation(formElement, validationRules = {}) {
+  const fields = formElement.querySelectorAll('input, select, textarea');
+  
+  fields.forEach(field => {
+    const fieldName = field.name || field.id;
+    if (!fieldName || !validationRules[fieldName]) return;
+    
+    field.addEventListener('blur', () => {
+      const result = validateField(field, validationRules[fieldName]);
+      
+      field.classList.toggle('valid', result.isValid);
+      field.classList.toggle('invalid', !result.isValid);
+      field.setAttribute('aria-invalid', !result.isValid);
+      
+      const errorContainer = field.parentElement.querySelector('.error-message') ||
+                            formElement.querySelector(`[data-error-for="${fieldName}"]`);
+      
+      if (errorContainer) {
+        if (!result.isValid) {
+          errorContainer.textContent = result.errors.join(', ');
+          errorContainer.style.display = 'block';
+        } else {
+          errorContainer.textContent = '';
+          errorContainer.style.display = 'none';
+        }
+      }
+    });
+  });
+}
+
 // Initialize on DOM ready
 function onDOMReady(callback) {
   if (document.readyState === 'loading') {
@@ -285,6 +439,10 @@ if (typeof module !== 'undefined' && module.exports) {
     storage,
     isInViewport,
     smoothScrollTo,
-    onDOMReady
+    onDOMReady,
+    validators,
+    validateField,
+    validateForm,
+    enableRealTimeValidation
   };
 }

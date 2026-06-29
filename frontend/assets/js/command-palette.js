@@ -29,14 +29,26 @@ class CommandPalette {
   
   async loadTools() {
     try {
-      // Use relative path that works from any page depth
-      const basePath = window.location.pathname.includes('/tools/') ? '../' : './';
+      // Calculate base path dynamically based on current URL depth
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      let basePath = './';
+      
+      // If we're in a nested path like /tools/qr-generator/, go up two levels
+      if (pathSegments.length > 0) {
+        basePath = '../'.repeat(pathSegments.length) || './';
+      }
+      
       const response = await fetch(`${basePath}data/tools.json`);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
       const data = await response.json();
       this.tools = data.tools || [];
     } catch (error) {
       console.error('Failed to load tools:', error);
       this.tools = [];
+      // Show error toast if available
+      if (typeof showErrorToast === 'function') {
+        showErrorToast('Failed to load tools. Please refresh.');
+      }
     }
   }
   
@@ -389,8 +401,16 @@ class CommandPalette {
       return;
     }
     
-    resultsContainer.innerHTML = this.filteredTools.map((tool, index) => `
-      <a href="/tools/${tool.slug}/" class="result-item ${index === this.selectedIndex ? 'selected' : ''}" data-index="${index}">
+    resultsContainer.innerHTML = this.filteredTools.map((tool, index) => {
+      // Calculate base path for each result item
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      let basePath = './';
+      if (pathSegments.length > 0) {
+        basePath = '../'.repeat(pathSegments.length) || './';
+      }
+      
+      return `
+      <a href="${basePath}tools/${tool.slug}/" class="result-item ${index === this.selectedIndex ? 'selected' : ''}" data-index="${index}">
         <div class="result-icon" style="background: ${tool.color}20; color: ${tool.color}">
           ${this.getIcon(tool.icon)}
         </div>
@@ -402,7 +422,7 @@ class CommandPalette {
           <path d="M9 18l6-6-6-6"></path>
         </svg>
       </a>
-    `).join('');
+    `}).join('');
     
     // Add click handlers
     resultsContainer.querySelectorAll('.result-item').forEach(item => {
@@ -428,8 +448,14 @@ class CommandPalette {
   }
   
   selectTool(tool) {
-    // Use relative path that works from any page depth
-    const basePath = window.location.pathname.includes('/tools/') ? '../' : './';
+    // Calculate base path dynamically based on current URL depth
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    let basePath = './';
+    
+    if (pathSegments.length > 0) {
+      basePath = '../'.repeat(pathSegments.length) || './';
+    }
+    
     window.location.href = `${basePath}tools/${tool.slug}/`;
   }
   

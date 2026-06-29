@@ -30,6 +30,25 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
   
+  <!-- Skip link for accessibility -->
+  <style>
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 0;
+      background: #6366f1;
+      color: white;
+      padding: 1rem;
+      z-index: 10001;
+      transition: top 0.3s;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+  </style>
+  
   <style>
     /* Additional homepage-specific styles */
     .hero-section {
@@ -455,8 +474,14 @@
   </style>
 </head>
 <body class="bg-grid">
+  <!-- Skip link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
   <!-- Navbar -->
   <div id="navbar-container"></div>
+  
+  <!-- Main Content -->
+  <main id="main-content">
   
   <!-- Hero Section -->
   <section class="hero-section">
@@ -575,16 +600,96 @@
     async function loadNavbar() {
       const navbarContainer = document.getElementById('navbar-container');
       if (!navbarContainer) return;
+      
       try {
+        // Handle file:// protocol by using XMLHttpRequest for better error handling
+        const isFileProtocol = window.location.protocol === 'file:';
+        
+        if (isFileProtocol) {
+          // For file:// protocol, use a fallback navbar directly
+          renderFallbackNavbar();
+          return;
+        }
+        
         const response = await fetch('./components/navbar.html');
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const html = await response.text();
         navbarContainer.innerHTML = html;
+        
+        // Initialize navbar scripts after loading
+        initNavbarScripts();
       } catch (error) {
         console.error('Failed to load navbar:', error);
-        navbarContainer.innerHTML = '<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(2,6,23,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.1);padding:1rem 1.5rem;"><div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;"><a href="./" style="color:#f1f5f9;text-decoration:none;font-size:1.25rem;font-weight:700;">🛠️ ToolsWala</a><div style="display:flex;gap:1.5rem;"><a href="./#tools" style="color:#94a3b8;text-decoration:none;">Tools</a><a href="./#about" style="color:#94a3b8;text-decoration:none;">About</a></div></div></nav>';
+        renderFallbackNavbar();
       }
     }
+    
+    function renderFallbackNavbar() {
+      const navbarContainer = document.getElementById('navbar-container');
+      if (!navbarContainer) return;
+      
+      navbarContainer.innerHTML = `
+        <nav class="navbar" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(2,6,23,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.1);padding:1rem 1.5rem;">
+          <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;">
+            <a href="./index.html" style="color:#f1f5f9;text-decoration:none;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:0.75rem;">
+              <span>🛠️</span>
+              <span>Tools<span style="background:linear-gradient(135deg, #6366f1, #d946ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Wala</span></span>
+            </a>
+            <div style="display:flex;gap:1.5rem;align-items:center;">
+              <a href="./#tools" style="color:#94a3b8;text-decoration:none;font-weight:500;">Tools</a>
+              <a href="./#about" style="color:#94a3b8;text-decoration:none;font-weight:500;">About</a>
+              <button id="fallback-search-btn" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;color:#94a3b8;cursor:pointer;" aria-label="Search tools">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span style="font-size:0.875rem;">Search</span>
+                <kbd style="padding:0.125rem 0.375rem;background:rgba(255,255,255,0.1);border-radius:0.25rem;font-size:0.75rem;font-family:monospace;">⌘K</kbd>
+              </button>
+            </div>
+          </div>
+        </nav>
+      `;
+      
+      // Attach search handler to fallback button
+      document.getElementById('fallback-search-btn')?.addEventListener('click', () => {
+        if (window.commandPalette) {
+          window.commandPalette.open();
+        }
+      });
+    }
+    
+    function initNavbarScripts() {
+      // Initialize mobile menu and search functionality
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const searchTrigger = document.getElementById('search-trigger');
+      const mobileSearchTrigger = document.getElementById('mobile-search-trigger');
+      
+      if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+          mobileMenuBtn.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+        });
+        
+        mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenuBtn.classList.remove('active');
+            mobileMenu.classList.remove('active');
+          });
+        });
+      }
+      
+      const openSearch = () => {
+        if (typeof commandPalette !== 'undefined' && commandPalette) {
+          commandPalette.open();
+        }
+      };
+      
+      searchTrigger?.addEventListener('click', openSearch);
+      mobileSearchTrigger?.addEventListener('click', openSearch);
+    }
+    
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadNavbar);
     else loadNavbar();
   </script>
@@ -638,16 +743,15 @@
       const categories = [
         { id: 'all', name: 'All Tools', icon: 'grid' },
         { id: 'generator', name: 'Generators', icon: 'sparkles' },
-        { id: 'editor', name: 'Editors', icon: 'edit' },
-        { id: 'utility', name: 'Utilities', icon: 'tool' },
-        { id: 'security', name: 'Security', icon: 'lock' },
-        { id: 'design', name: 'Design', icon: 'brush' }
+        { id: 'editor', name: 'Editors', icon: 'edit' }
       ];
       
       categoryFilter.innerHTML = categories.map(cat => `
         <button 
           class="filter-btn ${cat.id === currentCategory ? 'active' : ''}" 
           data-category="${cat.id}"
+          aria-pressed="${cat.id === currentCategory}"
+          type="button"
         >
           ${cat.name}
         </button>
@@ -659,6 +763,14 @@
           currentCategory = btn.dataset.category;
           updateActiveFilter();
           renderTools();
+        });
+        
+        // Add keyboard navigation
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+          }
         });
       });
     }
@@ -688,13 +800,13 @@
       }
       
       toolsGrid.innerHTML = filteredTools.map((tool, index) => `
-        <a href="./tools/${tool.slug}/" class="tool-card" style="animation: fadeInUp 0.5s ease-out ${index * 0.05}s both;">
-          <div class="tool-card-icon" style="background: ${tool.color}20; color: ${tool.color}">
+        <a href="./tools/${tool.slug}/" class="tool-card" style="animation: fadeInUp 0.5s ease-out ${index * 0.05}s both;" aria-label="${tool.name} - ${tool.description}">
+          <div class="tool-card-icon" style="background: ${tool.color}20; color: ${tool.color}" role="img" aria-label="${tool.icon}">
             ${getToolIcon(tool.icon)}
           </div>
           <h3 class="tool-card-title">${tool.name}</h3>
           <p class="tool-card-description">${tool.description}</p>
-          <div class="tool-card-arrow">
+          <div class="tool-card-arrow" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 18l6-6-6-6"/>
             </svg>
