@@ -17,50 +17,11 @@
       "description": "Edit, merge, split and extract text from PDF files",
       "category": "editor",
       "color": "#ec4899"
-    },
-    {
-      "id": "image-compress",
-      "name": "Image Compressor",
-      "slug": "image-compress",
-      "icon": "image",
-      "description": "Compress images without losing quality",
-      "category": "editor",
-      "color": "#10b981"
-    },
-    {
-      "id": "url-shortener",
-      "name": "URL Shortener",
-      "slug": "url-shortener",
-      "icon": "link",
-      "description": "Shorten long URLs into shareable links",
-      "category": "utility",
-      "color": "#f59e0b"
-    },
-    {
-      "id": "password-generator",
-      "name": "Password Generator",
-      "slug": "password-generator",
-      "icon": "shield",
-      "description": "Generate secure random passwords",
-      "category": "security",
-      "color": "#8b5cf6"
-    },
-    {
-      "id": "color-picker",
-      "name": "Color Picker",
-      "slug": "color-picker",
-      "icon": "palette",
-      "description": "Pick and convert colors between formats",
-      "category": "design",
-      "color": "#ef4444"
     }
   ],
   "categories": [
     { "id": "all", "name": "All Tools", "icon": "grid" },
     { "id": "generator", "name": "Generators", "icon": "sparkles" },
-    { "id": "editor", "name": "Editors", "icon": "edit" },
-    { "id": "utility", "name": "Utilities", "icon": "tool" },
-    { "id": "security", "name": "Security", "icon": "lock" },
-    { "id": "design", "name": "Design", "icon": "brush" }
+    { "id": "editor", "name": "Editors", "icon": "edit" }
   ]
 }

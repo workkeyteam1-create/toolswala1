@@ -1,1 +1,1 @@
-(frontend/assets/css/main.css, frontend/assets/js/command-palette.js, frontend/index.html are source files, so output nothing)
+(frontend/assets/css/main.css, frontend/assets/js/command-palette.js, frontend/assets/js/shared.js, frontend/data/tools.json, frontend/index.html are source files, not build artifacts or dependencies)
