@@ -7,6 +7,7 @@
 import { handleToolsRoutes } from './routes/tools.js';
 import { handleUserRoutes } from './routes/users.js';
 import { handleFileRoutes } from './routes/files.js';
+import { handleQRRoutes } from './routes/qr.js';
 import { corsHeaders } from './utils/cors.js';
 
 /**
@@ -52,6 +53,8 @@ export default {
         response = await handleUserRoutes(request, env, ctx);
       } else if (path.startsWith('/api/files')) {
         response = await handleFileRoutes(request, env, ctx);
+      } else if (path.startsWith('/api/qr')) {
+        response = await handleQRRoutes(request, env, ctx);
       } else if (path === '/api/health') {
         response = new Response(
           JSON.stringify({
@@ -78,6 +81,7 @@ export default {
               tools: '/api/tools',
               users: '/api/users',
               files: '/api/files',
+              qr: '/api/qr',
               health: '/api/health',
             },
           }),
